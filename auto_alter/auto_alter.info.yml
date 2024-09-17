@@ -1,0 +1,14 @@
+name: Automatic Alternative Text
+description: Automatically generate alt text.
+package: Custom
+type: module
+core_version_requirement: ^9 || ^10 || ^11
+configure: auto_alter.settings
+# project: 'auto_alter'
+dependencies:
+  - drupal:image
+
+# Information added by Drupal.org packaging script on 2024-08-20
+version: "2.0.4"
+project: "auto_alter"
+datestamp: 1724138046

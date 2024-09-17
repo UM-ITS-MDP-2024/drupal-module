@@ -1,0 +1,38 @@
+# Schema for the configuration files of the Auto Alter module.
+auto_alter.settings:
+  type: config_object
+  label: 'Auto Alter Config'
+  mapping:
+    endpoint:
+      type: string
+      label: 'Endpoint'
+    credential_provider:
+      type: string
+      label: 'Credential provider'
+    credentials:
+      type: sequence
+      label: 'Credentials'
+      sequence:
+        type: auto_alter.credentials.[%key]
+    status:
+      type: boolean
+      label: 'Status'
+    suggestion:
+      type: boolean
+      label: 'Suggestion'
+
+auto_alter.credentials.config:
+  type: mapping
+  label: 'Auto Alter credentials'
+  mapping:
+    api_key:
+      type: string
+      label: 'API Key'
+
+auto_alter.credentials.key:
+  type: mapping
+  label: 'Auto Alter credentials with Key Module'
+  mapping:
+    api_key_key:
+      type: string
+      label: 'API key'

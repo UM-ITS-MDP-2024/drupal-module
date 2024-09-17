@@ -1,0 +1,9 @@
+endpoint: ""
+credential_provider: "config"
+credentials:
+  config:
+    api_key: ""
+  key:
+    api_key_key: ""
+status: true
+suggestion: true
