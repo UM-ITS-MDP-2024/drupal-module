@@ -5,11 +5,11 @@
  * Contains auto_alter.module.
  */
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InvokeCommand;
+
 
 /**
  * Implements hook_modules_installed().
@@ -18,22 +18,8 @@ function auto_alter_modules_installed($modules) {
   return;
 }
 
-/**
- * Implements hook_entity_presave().
- */
-function auto_alter_entity_presave(EntityInterface $entity) {
-  // Loop through the entity's fields and find image fields.
-  foreach ($entity->getFieldDefinitions() as $field_name => $field_definition) {
-    if ($field_definition->getType() === 'image') {
-      $images = $entity->get($field_name);
-      foreach ($images as $key => $image) {
-        // Only set the alt text to "Hello World" if it's empty (i.e., new image upload).
-        if (empty($image->alt)) {
-          $images[$key]->alt = 'Hello World';
-        }
-      }
-    }
-  }
+function generate_alt_text($image) {
+  return 'temp';
 }
 
 /**
@@ -54,25 +40,23 @@ function auto_alter_form_alter(&$form, FormStateInterface $form_state, $form_id)
         foreach ($images as $key => $image) {
           // Ensure we only set alt text if it's not already set.
           if (isset($form[$field_name]['widget'][$key]['#alt_field']) && empty($form[$field_name]['widget'][$key]['#default_value']['alt'])) {
-            $form[$field_name]['widget'][$key]['#default_value']['alt'] = 'Hello World';
+            $form[$field_name]['widget'][$key]['#default_value']['alt'] = generate_alt_text($image);
           }
         }
 
-        // Add two new text fields below the alt text field.
-
-        // Text field 1: Regenerate.
-        $form[$field_name]['widget'][0]['regenerate_text_field'] = [
+        // Feedback Field
+        $form[$field_name]['widget'][0]['feedback_field'] = [
           '#type' => 'textfield',
-          '#title' => t('Regenerate'),
+          '#title' => t('Feedback'),
           '#default_value' => '',
           '#size' => 60,
           '#maxlength' => 128,
           '#attributes' => [
-            'name' => 'field_image[0][regenerate_text_field]', // Use the name attribute for regenerate field.
+            'name' => 'field_image[0][feedback_field]',
           ],
         ];
 
-        // Text field 2: New Alt Text.
+        // New Alt Text Field
         $form[$field_name]['widget'][0]['new_alt_text'] = [
           '#type' => 'textfield',
           '#title' => t('New Alt Text'),
@@ -80,11 +64,11 @@ function auto_alter_form_alter(&$form, FormStateInterface $form_state, $form_id)
           '#size' => 60,
           '#maxlength' => 128,
           '#attributes' => [
-            'name' => 'field_image[0][new_alt_text]', // Use the name attribute for the new alt text field.
+            'name' => 'field_image[0][new_alt_text]',
           ],
         ];
 
-        // Add the regenerate button with AJAX.
+        // Regenerate Button
         $form[$field_name]['widget'][0]['buttons_container']['regenerate_button'] = [
           '#type' => 'button',
           '#value' => t('Regenerate'),
@@ -95,39 +79,28 @@ function auto_alter_form_alter(&$form, FormStateInterface $form_state, $form_id)
             'progress' => ['type' => 'throbber'],
           ],
         ];
-        $form['#attached']['library'][] = '../auto_alter_js';
 
-        // Add the commit button.
+        // Commit Button
         $form[$field_name]['widget'][0]['buttons_container']['commit_button'] = [
           '#type' => 'button',
           '#value' => t('Commit'),
           '#attributes' => [
-            'onclick' => 'commitAltText(event);', // Add the JavaScript function for the commit button.
+            'onclick' => 'commitAltText(event);',
           ],
         ];
 
-        // Add the necessary JavaScript code to the form.
+        // JavaScript code for commit button
         $form['#attached']['html_head'][] = [
           [
             '#type' => 'html_tag',
             '#tag' => 'script',
             '#value' => '
-              function regenerateAltText(event) {
-                event.preventDefault();
-                document.querySelector("[name=\'field_image[0][new_alt_text]\']").value = "Regenerated Text";
-                document.querySelector("[name=\'field_image[0][new_alt_text]\']").focus();
-              }
-
               function commitAltText(event) {
                 event.preventDefault();
                 const newAltText = document.querySelector("[name=\'field_image[0][new_alt_text]\']").value;
-                console.log(newAltText);
                 document.querySelector("[data-drupal-selector=\'edit-field-media-image-0-alt\']").value = newAltText;
                 document.querySelector("[data-drupal-selector=\'edit-field-media-image-0-alt\']").focus();
               }
-              function myAjaxCallback (argument) {
-                console.log("myAjaxCallback is called.");
-              };
             ',
           ],
           'auto_alter_custom_js',
@@ -141,30 +114,11 @@ function auto_alter_form_alter(&$form, FormStateInterface $form_state, $form_id)
  * AJAX callback for regenerating the alt text.
  */
 function auto_alter_regenerate_callback(array &$form, FormStateInterface $form_state) {
-  // Simulate generating new alt text.
   $new_alt_text = 'Generated Alt Text: ' . rand(1000, 9999);
 
-  // Create an AjaxResponse object to send commands to the client.
   $response = new AjaxResponse();
 
-  // Invoke the custom JS function with the generated alt text as an argument.
-  $response->addCommand(new InvokeCommand(NULL, 'myAjaxCallback', [$new_alt_text]));
+  $response->addCommand(new InvokeCommand('[name="field_image[0][new_alt_text]"]', 'val', [$new_alt_text]));
 
   return $response;
-}
-
-/**
- * Implements hook_library_info().
- */
-function auto_alter_library_info() {
-  return [
-    'auto_alter_js' => [
-      'js' => [
-        'js/auto_alter.js' => [],
-      ],
-      'dependencies' => [
-        'core/jquery',
-      ],
-    ],
-  ];
 }
