@@ -18,8 +18,25 @@ function auto_alter_modules_installed($modules) {
   return;
 }
 
-function generate_alt_text($image) {
-  return 'temp';
+// TODO: make the API call here to get the text
+function generate_alt_text($fileID , $prevAltText = null, $feedBack = null) {
+  if (empty($fileID) || !is_numeric($fileID)) {
+    return 'Invalid file ID';
+  }
+
+  // Load the file entity.
+  $file = \Drupal::entityTypeManager()->getStorage('file')->load($fileID);
+
+  if ($file) {
+    $uri = $file->getFileUri();
+    $file_path = \Drupal::service('file_system')->realpath($uri); 
+    
+    // here we can call the encode and make the api call.
+    // $encodedImage = encodeImageToDataURL($file_path);
+    
+    return $file_path;
+  }
+   
 }
 
 /**
@@ -40,7 +57,7 @@ function auto_alter_form_alter(&$form, FormStateInterface $form_state, $form_id)
         foreach ($images as $key => $image) {
           // Ensure we only set alt text if it's not already set.
           if (isset($form[$field_name]['widget'][$key]['#alt_field']) && empty($form[$field_name]['widget'][$key]['#default_value']['alt'])) {
-            $form[$field_name]['widget'][$key]['#default_value']['alt'] = generate_alt_text($image);
+            $form[$field_name]['widget'][$key]['#default_value']['alt'] = generate_alt_text($form[$field_name]['widget'][$key]['#default_value']['fids'][0]);
           }
         }
 
@@ -51,6 +68,7 @@ function auto_alter_form_alter(&$form, FormStateInterface $form_state, $form_id)
           '#default_value' => '',
           '#size' => 60,
           '#maxlength' => 128,
+          '#parents' => ['field_image', 0, 'feedback_field'], 
           '#attributes' => [
             'name' => 'field_image[0][feedback_field]',
           ],
@@ -111,14 +129,65 @@ function auto_alter_form_alter(&$form, FormStateInterface $form_state, $form_id)
 }
 
 /**
- * AJAX callback for regenerating the alt text.
+ * AJAX callback for regenerating the alt text (now set to the file path).
  */
 function auto_alter_regenerate_callback(array &$form, FormStateInterface $form_state) {
-  $new_alt_text = 'Generated Alt Text: ' . rand(1000, 9999);
+  $new_alt_text = 'No file found';  // Default fallback message.
+  $entity = $form_state->getFormObject()->getEntity();
+  $entity_manager = \Drupal::service('entity_field.manager');
 
+  if (!($entity instanceof FieldableEntityInterface)) {
+    return;
+  }
+
+  // Iterate through all fields to find the image field.
+  foreach ($entity_manager->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle()) as $field_name => $field_definition) {
+    if (!empty($field_definition->getTargetBundle()) && $field_definition->getType() == 'image') {
+      $images = $entity->get($field_name);
+
+      // Loop through all images in the field.
+      foreach ($images as $key => $image) {
+        // Check if there's a valid file ID in the 'fids' array.
+        if (isset($form[$field_name]['widget'][$key]['#default_value']['fids'][0])) {
+          $fid = $form[$field_name]['widget'][$key]['#default_value']['fids'][0];
+          $alt_text =  $form_state->getValue(['field_media_image', 0, 'alt']);
+          $feedback = $form_state->getValue(['field_image', 0, 'feedback_field']);
+
+          $new_alt_text = generate_alt_text($fid, $alt_text, $feedback);
+        }
+      }
+    }
+  }
+
+  // Return an Ajax response to update the "New Alt Text" field with the file URL or path.
   $response = new AjaxResponse();
-
   $response->addCommand(new InvokeCommand('[name="field_image[0][new_alt_text]"]', 'val', [$new_alt_text]));
 
   return $response;
+}
+
+function encodeImageToDataURL($imagePath) {
+  $absolutePath = realpath($imagePath);
+  error_log('Resolved Image Path: ' . $absolutePath);
+
+  if ($absolutePath && file_exists($absolutePath)) {
+    // Get the MIME type of the file.
+    $fileMimeType = mime_content_type($absolutePath);
+
+    // Get the image data.
+    $imageData = file_get_contents($absolutePath);
+
+    if ($imageData !== false) {
+      // Base64 encode the image data.
+      $base64EncodedImage = base64_encode($imageData);
+
+      return "data:" . $fileMimeType . ";base64," . $base64EncodedImage;
+    } else {
+      error_log('Error: Could not read image data from path: ' . $absolutePath);
+      return 'Error: Could not read image data.';
+    }
+  } else {
+    error_log('Error: Image file not found at path: ' . $imagePath);
+    return 'Error: File not found.';
+  }
 }
