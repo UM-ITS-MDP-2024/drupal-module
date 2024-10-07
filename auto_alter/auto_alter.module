@@ -18,7 +18,7 @@ function auto_alter_modules_installed($modules) {
   return;
 }
 
-// TODO: make the API call here to get the text
+// make the API call here to get the text
 function generate_alt_text($fileID , $prevAltText = null, $feedBack = null) {
   if (empty($fileID) || !is_numeric($fileID)) {
     return 'Invalid file ID';
@@ -48,67 +48,80 @@ function generate_alt_text($fileID , $prevAltText = null, $feedBack = null) {
  * @return array An array of alt text options.
  */
 function generateAltText($imageUrl, $prevAltText = null, $feedBack = null) {
-    // Fixed API key and prompt within the function
-    // put ur api key in 
-    $apiKey = "";
-    $prompt = "
-    Create alt text for an image, following WCAG guidelines and SEO.
-    You should be able to make reasonable inference for the characters, locations, date, times, objects, etc. in the image and associate them with the context.
-    1. Be concise
-    2. Use correct grammar
-    3. Use keywords sparingly
-    4. Include relevant image text
-    5. Be clear and include necessary details 
-    6. Avoid repetition. Don't repeat what's already in the article.
-    7. Be factual and avoid extrapolations
-    8. Do not begin with \"Alt text:\"
-    Exception: Add more detail when the image is the main content focus.";
+  // Load configuration settings.
+  $config = \Drupal::config('auto_alter.settings');
 
-    if ($prevAltText != null) {
-        $prompt .= "Please generate new alt text based on previous alt text and user feedback.\n";
-        $prompt .= "Previous generated alt text: \n";
-        $prompt .= $prevAltText;
+  // Get the service selection (OpenAI or Azure OpenAI).
+  $service = $config->get('service_selection');
+
+  // Build the prompt.
+  $prompt = $service === 'openai' 
+    ? $config->get('openai_prompt') 
+    : $config->get('azure_prompt');
+  
+  if ($prevAltText) {
+    $prompt .= "Previous alt text: $prevAltText\n";
+  }
+  
+  if ($feedBack) {
+    $prompt .= "Feedback: $feedBack\n";
+  }
+
+  $model = 'gpt-4o';
+  $client = null;
+  // Switch between OpenAI and Azure OpenAI based on configuration.
+  if ($service === 'openai') {
+    $api_key = $config->get('openai_api_key');
+    $client = OpenAI::client($api_key);
+  }
+  elseif ($service === 'azure_openai') {
+    $api_key = $config->get('azure_api_key');
+    $endpoint = $config->get('azure_api_base');  // Example endpoint for Azure OpenAI
+    $api_version = $config->get('azure_api_version');
+    $organization = $config->get('azure_organization');
+    $client = OpenAI::factory()
+    ->withBaseUri($endpoint . '/openai/deployments/' . $model)
+    ->withHttpHeader('api-key', $api_key)
+    ->withQueryParam('api-version', $api_version)
+    ->withOrganization($organization)
+    ->make();
+  }
+  else {
+    return ['Invalid service selected'];
+  }
+
+  // Make the API request.
+  try {
+    $result = $client->chat()->create([
+      'model' => $model,
+      'messages' => [
+          ['role' => 'system', 
+          'content' => [
+              ['type' => 'text',
+              'text' => $prompt],
+          ]
+          ],
+          ['role' => 'user', 
+          'content' => [
+              ['type' => 'image_url',
+              'image_url' => ['url' => $imageUrl]],
+          ]
+          ]
+      ],
+      'max_tokens' => 500,
+      'n' => 1,
+      'temperature' => 0.3
+    ]);
+
+    $messagge = [];
+    for ($i = 0; $i < count($result->choices); $i++) {
+        $messagge[] = $result->choices[$i]->message->content;
     }
-    
-    if ($feedBack != null) {
-        $prompt .= "User feedback for alt text: \n";
-        $prompt .= $feedBack;
-    }
-
-    $client = \OpenAI::client($apiKey);
-
-
-    try {
-        $result = $client->chat()->create([
-            'model' => 'gpt-4-vision-preview', // Specify the model you wish to use
-            'messages' => [
-                ['role' => 'system', 
-                'content' => [
-                    ['type' => 'text',
-                    'text' => $prompt],
-                ]
-                ],
-                ['role' => 'user', 
-                'content' => [
-                    ['type' => 'image_url',
-                    'image_url' => $imageUrl],
-                ]
-                ]
-            ],
-            'max_tokens' => 500,
-            'n' => 1,
-            'temperature' => 0.3
-        ]);
-
-        $messagge = [];
-        for ($i = 0; $i < count($result->choices); $i++) {
-            $messagge[] = $result->choices[$i]->message->content;
-        }
-        return $messagge;
-    } catch (\Exception $e) {
-        error_log($e);
-        return [$e->getMessage()];
-    }
+    return $messagge;
+  }
+  catch (Exception $e) {
+    return ['Error generating alt text: ' . $e->getMessage()];
+  }
 }
 
 /**
@@ -216,7 +229,8 @@ function auto_alter_regenerate_callback(array &$form, FormStateInterface $form_s
   foreach ($entity_manager->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle()) as $field_name => $field_definition) {
     if (!empty($field_definition->getTargetBundle()) && $field_definition->getType() == 'image') {
       $images = $entity->get($field_name);
-
+      // log the form_state
+      \Drupal::logger('auto_alter')->notice('<pre>' . print_r($form_state->getValues(), TRUE) . '</pre>');
       // Loop through all images in the field.
       foreach ($images as $key => $image) {
         // Check if there's a valid file ID in the 'fids' array.
@@ -240,7 +254,6 @@ function auto_alter_regenerate_callback(array &$form, FormStateInterface $form_s
 
 function encodeImageToDataURL($imagePath) {
   $absolutePath = realpath($imagePath);
-  error_log('Resolved Image Path: ' . $absolutePath);
 
   if ($absolutePath && file_exists($absolutePath)) {
     // Get the MIME type of the file.

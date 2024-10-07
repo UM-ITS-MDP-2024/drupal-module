@@ -5,7 +5,6 @@
  * Install, update and uninstall functions for the auto_alter module.
  */
 
-use Drupal\auto_alter\AutoAlterCredentials;
 use Drupal\Core\Url;
 use Drupal\image\Entity\ImageStyle;
 

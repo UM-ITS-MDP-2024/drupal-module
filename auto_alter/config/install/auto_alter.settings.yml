@@ -2,8 +2,33 @@ endpoint: ""
 credential_provider: "config"
 credentials:
   config:
-    api_key: ""
+    openai_api_key: ""
+    azure_api_key: ""
+    azure_api_base: ""
+    azure_organization: ""
+    azure_api_version: ""
   key:
     api_key_key: ""
 status: true
 suggestion: true
+service_selection: "openai"
+openai_prompt: "Create alt text for an image, following WCAG guidelines, at most 125 characters long.  
+Make reasonable inferences only when identifying well-known characters, locations, objects, or text that are clearly visible in the image. 
+Do not infer emotions, intentions, or any contextual meaning not directly observable in the image.
+1. Begin by describing the main subject, followed by key details, and conclude with visible contextual elements.
+2. Include relevant image text verbatim if it's integral to understanding the image.
+3. Be clear and include necessary details without over-describing.
+4. Avoid repetition and redundancy.
+5. Do not make inferences or suggestions (e.g., don't say 'this shows/means/suggests...').
+6. Do not begin with 'Alt text:'.
+7. Incorporate keywords directly relevant to the image's primary content; avoid keyword stuffing (1-2 keywords max)."
+azure_prompt: "Create alt text for an image, following WCAG guidelines, at most 125 characters long.  
+Make reasonable inferences only when identifying well-known characters, locations, objects, or text that are clearly visible in the image. 
+Do not infer emotions, intentions, or any contextual meaning not directly observable in the image.
+1. Begin by describing the main subject, followed by key details, and conclude with visible contextual elements.
+2. Include relevant image text verbatim if it's integral to understanding the image.
+3. Be clear and include necessary details without over-describing.
+4. Avoid repetition and redundancy.
+5. Do not make inferences or suggestions (e.g., don't say 'this shows/means/suggests...').
+6. Do not begin with 'Alt text:'.
+7. Incorporate keywords directly relevant to the image's primary content; avoid keyword stuffing (1-2 keywords max)."

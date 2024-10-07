@@ -8,31 +8,50 @@ auto_alter.settings:
       label: 'Endpoint'
     credential_provider:
       type: string
-      label: 'Credential provider'
+      label: 'Credential Provider'
     credentials:
-      type: sequence
+      type: mapping
       label: 'Credentials'
-      sequence:
-        type: auto_alter.credentials.[%key]
+      mapping:
+        config:
+          type: mapping
+          label: 'Auto Alter Credentials'
+          mapping:
+            openai_api_key:
+              type: string
+              label: 'OpenAI API Key'
+            azure_api_key:
+              type: string
+              label: 'Azure API Key'
+            azure_api_base:
+              type: string
+              label: 'Azure API Base URL'
+            azure_organization:
+              type: string
+              label: 'Azure OpenAI Organization'
+            azure_api_version:
+              type: string
+              label: 'Azure API Version'
+        key:
+          type: mapping
+          label: 'Auto Alter Credentials with Key Module'
+          mapping:
+            api_key_key:
+              type: string
+              label: 'API Key (Key Module)'
+
+    service_selection:
+      type: string
+      label: 'Service Selection'
+    openai_prompt:
+      type: string
+      label: 'Predefined OpenAI Prompt'
+    azure_prompt:
+      type: string
+      label: 'Predefined Azure OpenAI Prompt'
     status:
       type: boolean
       label: 'Status'
     suggestion:
       type: boolean
       label: 'Suggestion'
-
-auto_alter.credentials.config:
-  type: mapping
-  label: 'Auto Alter credentials'
-  mapping:
-    api_key:
-      type: string
-      label: 'API Key'
-
-auto_alter.credentials.key:
-  type: mapping
-  label: 'Auto Alter credentials with Key Module'
-  mapping:
-    api_key_key:
-      type: string
-      label: 'API key'

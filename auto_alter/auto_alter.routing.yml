@@ -5,10 +5,3 @@ auto_alter.settings:
     _title: "Automatic Alternative Text"
   requirements:
     _permission: "administer Automatic Alternative Text"
-auto_alter.ajax_regenerate:
-  path: "/ajax/auto_alter_regenerate"
-  defaults:
-    _controller: '\Drupal\auto_alter\Controller\AutoAlterController::regenerateAltText'
-    _title: "Regenerate Alt Text"
-  requirements:
-    _permission: "access content"
