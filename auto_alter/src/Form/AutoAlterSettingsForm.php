@@ -106,7 +106,7 @@ class AutoAlterSettingsForm extends ConfigFormBase {
 
     if ($service === 'openai') {
       $form['service_fields']['openai_api_key'] = [
-        '#type' => 'textfield',
+        '#type' => 'password',
         '#title' => $this->t('OpenAI API Key'),
         '#default_value' => $config->get('openai_api_key'),
       ];
@@ -133,7 +133,7 @@ class AutoAlterSettingsForm extends ConfigFormBase {
       ];
 
       $form['service_fields']['azure_api_key'] = [
-        '#type' => 'textfield',
+        '#type' => 'password',
         '#title' => $this->t('Azure API Key'),
         '#default_value' => $config->get('azure_api_key'),
       ];
