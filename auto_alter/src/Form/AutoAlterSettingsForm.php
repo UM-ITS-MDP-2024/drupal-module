@@ -108,7 +108,11 @@ class AutoAlterSettingsForm extends ConfigFormBase {
       $form['service_fields']['openai_api_key'] = [
         '#type' => 'password',
         '#title' => $this->t('OpenAI API Key'),
-        '#default_value' => $config->get('openai_api_key'),
+        '#description' => $this->t('Leave empty to keep the current API key.'),
+        '#attributes' => [
+        'autocomplete' => 'off',
+        'placeholder' => $this->t('Current API key is set'),
+        ],
       ];
 
       $form['service_fields']['openai_prompt'] = [
@@ -135,7 +139,11 @@ class AutoAlterSettingsForm extends ConfigFormBase {
       $form['service_fields']['azure_api_key'] = [
         '#type' => 'password',
         '#title' => $this->t('Azure API Key'),
-        '#default_value' => $config->get('azure_api_key'),
+        '#description' => $this->t('Leave empty to keep the current API key.'),
+        '#attributes' => [
+        'autocomplete' => 'off',
+        'placeholder' => $this->t('Current API key is set'),
+        ],
       ];
 
       $form['service_fields']['azure_organization'] = [
@@ -214,6 +222,7 @@ class AutoAlterSettingsForm extends ConfigFormBase {
     }
 
     $config->save();
+    $form_state->setRedirect('system.admin_config'); 
     parent::submitForm($form, $form_state);
   }
 
