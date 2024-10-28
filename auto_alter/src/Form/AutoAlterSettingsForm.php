@@ -19,7 +19,8 @@ Do not infer emotions, intentions, or any contextual meaning not directly observ
 4. Avoid repetition and redundancy.
 5. Do not make inferences or suggestions (e.g., don't say 'this shows/means/suggests...').
 6. Do not begin with 'Alt text:'.
-7. Incorporate keywords directly relevant to the image's primary content; avoid keyword stuffing (1-2 keywords max).";
+7. Incorporate keywords directly relevant to the image's primary content; avoid keyword stuffing (1-2 keywords max).
+8. If the prompt includes a 'Feedback' and/or 'Previous alt text' field, then consider these values and return a new caption.";
 
 /**
  * Class AutoAlterSettingsForm.
@@ -105,13 +106,15 @@ class AutoAlterSettingsForm extends ConfigFormBase {
     $service = $form_state->getValue('service_selection', $config->get('service_selection') ?: 'openai');
 
     if ($service === 'openai') {
+      $apiKey = $config->get('openai_api_key');
+
       $form['service_fields']['openai_api_key'] = [
         '#type' => 'password',
         '#title' => $this->t('OpenAI API Key'),
         '#description' => $this->t('Leave empty to keep the current API key.'),
         '#attributes' => [
         'autocomplete' => 'off',
-        'placeholder' => $this->t('Current API key is set'),
+        'placeholder' => $apiKey ? $this->t('Current API key is set') : $this->t('API key is not set'),
         ],
       ];
 
@@ -129,6 +132,8 @@ class AutoAlterSettingsForm extends ConfigFormBase {
       ];
     }
     elseif ($service === 'azure_openai') {
+      $apiKey = $config->get('azure_api_key');
+
       $form['service_fields']['azure_api_base'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Azure API Base URL'),
@@ -142,7 +147,7 @@ class AutoAlterSettingsForm extends ConfigFormBase {
         '#description' => $this->t('Leave empty to keep the current API key.'),
         '#attributes' => [
         'autocomplete' => 'off',
-        'placeholder' => $this->t('Current API key is set'),
+        'placeholder' => $apiKey ? $this->t('Current API key is set') : $this->t('API key is not set'),
         ],
       ];
 
