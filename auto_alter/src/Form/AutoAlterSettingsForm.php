@@ -19,8 +19,7 @@ Do not infer emotions, intentions, or any contextual meaning not directly observ
 4. Avoid repetition and redundancy.
 5. Do not make inferences or suggestions (e.g., don't say 'this shows/means/suggests...').
 6. Do not begin with 'Alt text:'.
-7. Incorporate keywords directly relevant to the image's primary content; avoid keyword stuffing (1-2 keywords max).
-8. If the prompt includes a 'Feedback' and/or 'Previous alt text' field, then consider these values and return a new caption.";
+7. Incorporate keywords directly relevant to the image's primary content; avoid keyword stuffing (1-2 keywords max).";
 
 /**
  * Class AutoAlterSettingsForm.

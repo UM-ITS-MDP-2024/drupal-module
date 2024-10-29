@@ -60,7 +60,9 @@ function generateAltText($imageUrl, $prevAltText = null, $feedBack = null) {
     : $config->get('azure_prompt');
   
   if ($prevAltText) {
-    $prompt .= "Previous alt text: $prevAltText\n";
+    $prompt .= "\n\nNow please regenerate another alt text based on the previous alt text 
+                and feedback (if there is not feedback, just generate a different one). 
+                \n\nPrevious alt text: $prevAltText\n";
   }
   
   if ($feedBack) {
