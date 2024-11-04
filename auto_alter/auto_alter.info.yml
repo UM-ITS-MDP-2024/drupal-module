@@ -6,8 +6,10 @@ core_version_requirement: ^9 || ^10 || ^11
 configure: auto_alter.settings
 dependencies:
   - drupal:image
+  - drupal:media
+  - drupal:media_library
 
 # Information added by Drupal.org packaging script on 2024-08-20
-version: "0.0.1"
+version: "1.0.1"
 project: "auto_alte_umits"
 datestamp: 1724138046
