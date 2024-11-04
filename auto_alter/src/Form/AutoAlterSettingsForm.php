@@ -2,13 +2,10 @@
 
 namespace Drupal\auto_alter\Form;
 
-use Drupal\auto_alter\AutoAlterCredentials;
-use Drupal\auto_alter\Plugin\AutoAlterDescribeImagePluginManager;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
 
 const DEFAULT_PROMPT = "Create alt text for an image, following WCAG guidelines, at most 125 characters long.  
 Make reasonable inferences only when identifying well-known characters, locations, objects, or text that are clearly visible in the image. 
@@ -52,18 +49,10 @@ class AutoAlterSettingsForm extends ConfigFormBase {
   protected $modulehandler;
 
   /**
-   * The Describe Image Plugin Manager.
-   *
-   * @var AutoAlterDescribeImagePluginManager
-   */
-  protected $describeImage;
-
-  /**
    * Class constructor.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, AutoAlterDescribeImagePluginManager $describe_image) {
+  public function __construct(ModuleHandlerInterface $module_handler) {
     $this->modulehandler = $module_handler;
-    $this->describeImage = $describe_image;
   }
 
   /**
@@ -72,8 +61,7 @@ class AutoAlterSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     // Instantiates this form class.
     return new static(
-      $container->get('module_handler'),
-      $container->get('plugin.manager.auto_alter_describe_image')
+      $container->get('module_handler')
     );
   }
 

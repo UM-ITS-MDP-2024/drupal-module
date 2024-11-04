@@ -1,0 +1,23 @@
+{
+    "name": "um-its-mdp-2024/auto-alter",
+    "description": "A Drupal module that automatically generates alt text using OpenAI or Azure ChatGPT services.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "require": {
+      "drupal/core": "^9 || ^10 || ^11",
+      "php": ">=8.1",
+      "openai-php/client": "^0.10.1"
+    },
+    "extra": {
+      "drupal": {
+        "type": "module",
+        "package": "Accessibility"
+      }
+    },
+    "autoload": {
+      "psr-4": {
+        "Drupal\\auto_alter\\": "src/"
+      }
+    }
+  }
+  

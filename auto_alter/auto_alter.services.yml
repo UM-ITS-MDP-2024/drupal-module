@@ -1,4 +1,0 @@
-services:
-  plugin.manager.auto_alter_describe_image:
-    class: \Drupal\auto_alter\Plugin\AutoAlterDescribeImagePluginManager
-    parent: default_plugin_manager

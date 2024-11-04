@@ -15,8 +15,11 @@ use Drupal\Core\Ajax\InvokeCommand;
  * Implements hook_modules_installed().
  */
 function auto_alter_modules_installed($modules) {
-  return;
+  if (in_array('auto_alter', $modules)) {
+    \Drupal::messenger()->addMessage(t('Automatic Alternative Text module installed. Please go to the <a href="/admin/config/media/auto_alter">configuration page</a> to set up your preferences.'), 'status');
+  }
 }
+
 
 // make the API call here to get the text
 function generate_alt_text($fileID , $prevAltText = null, $feedBack = null) {
@@ -111,8 +114,8 @@ function generateAltText($imageUrl, $prevAltText = null, $feedBack = null) {
           ]
       ],
       'max_tokens' => 500,
-      'n' => 1,
-      'temperature' => 0.3
+      'n' => 1, 
+      'temperature' => 1.0
     ]);
 
     $messagge = [];
