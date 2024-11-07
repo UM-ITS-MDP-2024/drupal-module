@@ -16,7 +16,7 @@ use Drupal\Core\Ajax\InvokeCommand;
  */
 function auto_alter_modules_installed($modules) {
   if (in_array('auto_alter', $modules)) {
-    \Drupal::messenger()->addMessage(t('Automatic Alternative Text module installed. Please go to the <a href="/admin/config/media/auto_alter">configuration page</a> to set up your preferences.'), 'status');
+    \Drupal::messenger()->addMessage(t('Automatic Alternative Text module installed. Please go to the <a href="/admin/config/media/umits_auto_alt_text">configuration page</a> to set up your preferences.'), 'status');
   }
 }
 

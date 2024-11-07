@@ -1,5 +1,5 @@
 auto_alter.settings:
-  path: "admin/config/media/auto_alter"
+  path: "admin/config/media/umits_auto_alt_text"
   defaults:
     _form: '\Drupal\auto_alter\Form\AutoAlterSettingsForm'
     _title: "Automatic Alternative Text"
