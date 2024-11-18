@@ -10,6 +10,6 @@ dependencies:
   - drupal:media_library
 
 # Information added by Drupal.org packaging script on 2024-08-20
-version: "1.0.1"
+version: "1.0.2"
 project: "auto_alter_umits"
 datestamp: 1724138046
