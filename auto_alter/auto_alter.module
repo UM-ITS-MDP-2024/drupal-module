@@ -206,6 +206,10 @@ function auto_alter_form_alter(&$form, FormStateInterface $form_state, $form_id)
               function commitAltText(event) {
                 event.preventDefault();
                 const newAltText = document.querySelector("[name=\'field_image[0][new_alt_text]\']").value;
+                if (newAltText.trim() === "") {
+                  alert("There is no new alt text");
+                  return;
+                } 
                  try {
                   document.querySelector("[name=\'field_media_image[0][alt]\']").value = newAltText;
                   document.querySelector("[name=\'field_media_image[0][alt]\']").focus();
