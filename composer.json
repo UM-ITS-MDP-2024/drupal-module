@@ -16,7 +16,8 @@
     },
     "autoload": {
       "psr-4": {
-        "Drupal\\auto_alter\\": "src/"
+        "Drupal\\auto_alter\\": "src/",
+        "Drupal\\root\\": "auto_alter/"
       }
     }
   }
