@@ -95,68 +95,66 @@ class AutoAlterFunctionalTest extends BrowserTestBase {
    * Tests the Auto Alter configuration and image upload workflow.
    */
   public function testAutoAlterWorkflow() {
-    $this->assertTrue(true);
-    // $this->drupalLogin($this->adminUser);
+    $this->drupalLogin($this->adminUser);
 
-    // // 1. Test configuration form
-    // $this->drupalGet('admin/config/media/umits_auto_alt_text');
-    // $this->assertSession()->statusCodeEquals(200);
-    // $this->assertSession()->pageTextContains('Automatic Alternative Text');
+    // 1. Test configuration form
+    $this->drupalGet('admin/config/media/umits_auto_alt_text');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Automatic Alternative Text');
 
-    // // Submit configuration
-    // $config = [
-    //   'credential_provider' => 'config',
-    //   'service_selection' => 'openai',
-    //   'credentials[config][openai_api_key]' => 'test-api-key',
-    //   'status' => '1',
-    // ];
-    // $this->submitForm($config, 'Save configuration');
-    // $this->assertSession()->pageTextContains('The configuration options have been saved');
+    // Submit configuration
+    $config = [
+      'credential_provider' => 'config',
+      'service_selection' => 'openai',
+      'credentials[config][openai_api_key]' => 'test-api-key',
+      'status' => '1',
+    ];
+    $this->submitForm($config, 'Save configuration');
+    $this->assertSession()->pageTextContains('The configuration options have been saved');
 
-    // // 2. Test image upload and alt text generation
-    // // Prepare a test image
-    // $image_path = \Drupal::service('file_system')
-    //   ->copy(\Drupal::root() . '/core/misc/druplicon.png', 'public://test-image.png');
-    // $this->assertNotFalse($image_path, 'Image copied successfully');
+    // 2. Test image upload and alt text generation
+    // Prepare a test image
+    $image_path = \Drupal::service('file_system')
+      ->copy(\Drupal::root() . '/core/misc/druplicon.png', 'public://test-image.png');
+    $this->assertNotFalse($image_path, 'Image copied successfully');
 
-    // // Create a node with an image
-    // $this->drupalGet('node/add/article');
-    // $this->assertSession()->statusCodeEquals(200);
+    // Create a node with an image
+    $this->drupalGet('node/add/article');
+    $this->assertSession()->statusCodeEquals(200);
 
-    // // Fill in the node form
-    // $edit = [
-    //   'title[0][value]' => 'Test Article',
-    //   'files[field_image_0]' => $image_path,
-    // ];
-    // $this->submitForm($edit, 'Save');
+    // Fill in the node form
+    $edit = [
+      'title[0][value]' => 'Test Article',
+      'files[field_image_0]' => $image_path,
+    ];
+    $this->submitForm($edit, 'Save');
 
-    // // Wait for AJAX to complete
-    // $this->assertSession()->waitForElement('css', '.image-widget');
+    // Wait for AJAX to complete
+    $this->assertSession()->waitForElement('css', '.image-widget');
 
-    // // Verify the presence of auto-alter elements
-    // $this->assertSession()->elementExists('css', '[name="field_image[0][feedback_field]"]');
-    // $this->assertSession()->elementExists('css', '[name="field_image[0][new_alt_text]"]');
-    // $this->assertSession()->buttonExists('Regenerate');
-    // $this->assertSession()->buttonExists('Commit');
+    // Verify the presence of auto-alter elements
+    $this->assertSession()->elementExists('css', '[name="field_image[0][feedback_field]"]');
+    $this->assertSession()->elementExists('css', '[name="field_image[0][new_alt_text]"]');
+    $this->assertSession()->buttonExists('Regenerate');
+    $this->assertSession()->buttonExists('Commit');
 
-    // // Test regenerate functionality
-    // $this->click('input[value="Regenerate"]');
-    // $this->assertSession()->assertWaitOnAjaxRequest();
+    // Test regenerate functionality
+    $this->click('input[value="Regenerate"]');
+    $this->assertSession()->assertWaitOnAjaxRequest();
 
-    // // Verify the new alt text field is populated
-    // $new_alt_text = $this->assertSession()
-    //   ->elementExists('css', '[name="field_image[0][new_alt_text]"]')
-    //   ->getValue();
-    // $this->assertNotEmpty($new_alt_text, 'Alt text was generated');
+    // Verify the new alt text field is populated
+    $new_alt_text = $this->assertSession()
+      ->elementExists('css', '[name="field_image[0][new_alt_text]"]')
+      ->getValue();
+    $this->assertNotEmpty($new_alt_text, 'Alt text was generated');
   }
 
   /**
    * Tests the module installation message.
    */
   public function testInstallationMessage() {
-    $this->assertTrue(true);
-    // $this->drupalLogin($this->adminUser);
-    // $this->drupalGet('admin/modules');
-    // $this->assertSession()->pageTextContains('Auto Alter');
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('admin/modules');
+    $this->assertSession()->pageTextContains('Auto Alter');
   }
 }

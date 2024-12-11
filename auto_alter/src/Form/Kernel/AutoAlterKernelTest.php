@@ -142,19 +142,18 @@ class AutoAlterKernelTest extends KernelTestBase {
       ]
     ];
 
-    // // Mock the OpenAI client
-    // $mockClient = $this->getMockBuilder(OpenAI::class)
-    //   ->disableOriginalConstructor()
-    //   ->getMock();
+    // Mock the OpenAI client
+    $mockClient = $this->getMockBuilder(OpenAI::class)
+      ->disableOriginalConstructor()
+      ->getMock();
 
-    // // Set up the mock to return our mock response
-    // $mockClient->method('chat')
-    //   ->willReturn($mockResponse);
+    // Set up the mock to return our mock response
+    $mockClient->method('chat')
+      ->willReturn($mockResponse);
 
-    // Test the function
-    // $alt_text = generate_alt_text($this->testImage->id());
-    $this->assertTrue(true);
-    // $this->assertNotEmpty($alt_text);
+    Test the function
+    $alt_text = generate_alt_text($this->testImage->id());
+    $this->assertNotEmpty($alt_text);
   }
 
   /**
@@ -162,10 +161,9 @@ class AutoAlterKernelTest extends KernelTestBase {
    */
   public function testGenerateAltTextDirectly() {
     $image_url = encodeImageToDataURL($this->testImage->getFileUri());
-    // $alt_text = generateAltText($image_url);
-    $this->assertTrue(true);
-    // $this->assertIsArray($alt_text);
-    // $this->assertNotEmpty($alt_text);
+    $alt_text = generateAltText($image_url);
+    $this->assertIsArray($alt_text);
+    $this->assertNotEmpty($alt_text);
   }
 
   /**
@@ -220,10 +218,8 @@ class AutoAlterKernelTest extends KernelTestBase {
     
     $form['field_image']['widget'][0]['#default_value']['fids'] = [$this->testImage->id()];
     
-    // $response = auto_alter_regenerate_callback($form, $form_state);
-
-    $this->assertTrue(true);
+    $response = auto_alter_regenerate_callback($form, $form_state);
     
-    // $this->assertInstanceOf('\Drupal\Core\Ajax\AjaxResponse', $response);
+    $this->assertInstanceOf('\Drupal\Core\Ajax\AjaxResponse', $response);
   }
 }
